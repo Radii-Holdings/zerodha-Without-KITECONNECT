@@ -2,9 +2,11 @@ from kite_trade import *
 import pandas as pd 
 import datetime
 import os
-
-user_id = 'HQ2948'
-enctoken = "g/Q0/ePTzQozQmMe9CmBK0pvHIl8rxeLY8MFs4ybR4vOrQIQxK2f99QVVLW4Ckf9AUuKOLevDjZeexZv9oi82LCmVCzJR0uWJfBKT8IBvECVZKXGLRmHgA=="
+import configparser
+config = configparser.ConfigParser()
+config.read('config.ini')
+user_id = config['zerodha']['userID']
+enctoken = get_enctoken(user_id, config['zerodha']['password'])
 kite = KiteApp(enctoken=enctoken)
 datetime_now = datetime.datetime.now()
 
@@ -12,7 +14,17 @@ datetime_now = datetime.datetime.now()
 # print(kite.orders())
 # print(kite.positions())
 
-instrument_token = 2433027
+import requests
+instruments_fileName = f"./data/instruments_{datetime_now.strftime('%d-%m-%Y')}.csv"
+# download the instruments file from the kite api and save it to the data folder with today's date
+if not os.path.exists(instruments_fileName):
+    instruments = requests.get("https://api.kite.trade/instruments", headers={"Authorization": f"enctoken {enctoken}"}).text
+    with open(instruments_fileName, "w") as f:
+        f.write(instruments)
+# search for a particular instument based on tradingsymbol, segment=CDS-FUT and print results
+json_instruments = pd.read_csv(f"./data/instruments_{datetime_now.strftime('%d-%m-%Y')}.csv")
+
+instrument_token = json_instruments[(json_instruments['tradingsymbol'] == 'USDINR25FEBFUT') & (json_instruments['segment'] == 'CDS-FUT')]['instrument_token'].values[0]
 instrument_storagePath = f'./data/{instrument_token}'
 instrument_storagePath_postfix = f'/{datetime_now.strftime("%d-%m-%Y#%H-%M")}.csv'
 # print(kite.quote(instrument_token))

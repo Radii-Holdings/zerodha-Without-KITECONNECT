@@ -12,16 +12,21 @@ import requests
 import dateutil.parser
 
 
-def get_enctoken(userid, password, twofa):
+def get_enctoken(userid, password, twofa= None):
     session = requests.Session()
-    response = session.post('https://kite.zerodha.com/api/login', data={
+    response_login = session.post('https://kite.zerodha.com/api/login', data={
         "user_id": userid,
-        "password": password
+        "password": password,
+        "type": "user_id"
+
     })
+    print(response_login.json())
+    if twofa is None:
+        twofa = input("Enter OTP: ")
     response = session.post('https://kite.zerodha.com/api/twofa', data={
-        "request_id": response.json()['data']['request_id'],
+        "request_id": response_login.json()['data']['request_id'],
         "twofa_value": twofa,
-        "user_id": response.json()['data']['user_id']
+        "user_id": response_login.json()['data']['user_id']
     })
     enctoken = response.cookies.get('enctoken')
     if enctoken:
