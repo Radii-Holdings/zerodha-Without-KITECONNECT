@@ -130,15 +130,16 @@ class KiteApp:
         return records
 
     def margins(self):
-        margins = self.session.get(f"{self.root_url}/user/margins", headers=self.headers).json()["data"]
+        margins = self.session.get(f"{self.oms_url}/user/margins", headers=self.headers).json()["data"]
         return margins
 
     def orders(self):
-        orders = self.session.get(f"{self.root_url}/orders", headers=self.headers).json()["data"]
+        orders = self.session.get(f"{self.oms_url}/orders", headers=self.headers).json()["data"]
         return orders
 
     def positions(self):
-        positions = self.session.get(f"{self.root_url}/portfolio/positions", headers=self.headers).json()["data"]
+        positions = self.session.get(f"{self.oms_url}/portfolio/positions", headers=self.headers).json()["data"]
+        print(positions)
         return positions
 
     def place_order(self, variety, exchange, tradingsymbol, transaction_type, quantity, product, order_type, price=None,

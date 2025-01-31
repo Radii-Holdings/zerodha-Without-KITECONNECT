@@ -11,7 +11,7 @@ kite = KiteApp(enctoken=enctoken)
 datetime_now = datetime.datetime.now()
 
 # print(kite.margins())
-# print(kite.orders())
+print(kite.orders())
 # print(kite.positions())
 
 import requests
